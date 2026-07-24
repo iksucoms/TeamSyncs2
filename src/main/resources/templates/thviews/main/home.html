@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="csrf-header" th:content="${_csrf.headerName}">
+<meta name="csrf-token" th:content="${_csrf.token}">
+<title>TeamSync - 홈</title>
+<style>
+:root{--primary:#6c5ce7;--violet:#8f65f6;--rose:#e46aa1;--green:#34b77b;--orange:#f0a04b;--muted:#7b7394;--line:#e8e1fb;--ink:#1e1635;--blueS:#f1edff;--greenS:#eef9f4;--orangeS:#fff5ea;--violetS:#f5f0ff;--roseS:#fff1f7;--shadow:0 16px 44px rgba(73,47,133,.12);--soft:0 8px 22px rgba(73,47,133,.08);--r:24px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;background:radial-gradient(circle at top left,#f4eeff 0,#efe8ff 24%,#f6f2ff 48%,#f8f6ff 70%,#fbf9ff 100%);color:var(--ink)}
+button,input,select,textarea{font-family:inherit;cursor:pointer}
+.app{max-width:1720px;margin:0 auto;padding:24px}
+.top{height:74px;background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.9);border-radius:30px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;padding:0 22px;margin-bottom:22px;position:sticky;top:16px;z-index:50;backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:950;letter-spacing:-.055em;cursor:pointer;text-decoration:none;color:var(--ink)}
+.mark{width:44px;height:44px;border-radius:17px;background:linear-gradient(135deg,var(--primary),#8f65f6);color:#fff;display:grid;place-items:center;font-weight:950}
+.topR{display:flex;align-items:center;gap:10px;position:relative}
+.btn{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;font-weight:950;background:#fff;color:#42485b;cursor:pointer;transition:.15s}
+.btn.primary{background:linear-gradient(135deg,var(--primary),#7476ff);border:0;color:#fff;box-shadow:0 12px 24px rgba(86,87,245,.2)}
+.btn:hover{transform:translateY(-1px)}
+.chipRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;color:#5e6578;font-weight:900;font-size:12px;cursor:pointer;transition:.15s}
+.chip.active{background:linear-gradient(135deg,#2b2346,#46367e);border-color:#2b2346;color:#fff}
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);border-radius:var(--r);overflow:hidden}
+.pad{padding:20px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.head h2{font-size:18px;margin:0;letter-spacing:-.04em}
+.head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.hero{background:linear-gradient(135deg,#fff,#f5f7ff);border-radius:30px;padding:22px 26px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.eyebrow{font-size:12px;color:var(--primary);font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:30px;line-height:1.14;letter-spacing:-.065em;margin:6px 0}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+.homeGrid{display:grid;grid-template-columns:300px 1fr 330px;gap:20px;align-items:start}
+.teamCard{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--soft);transition:.15s;cursor:pointer;margin-bottom:10px}
+.teamCard:hover{transform:translateY(-3px);border-color:rgba(108,92,231,.3)}
+.teamTop{display:flex;align-items:center;gap:12px}
+.tIcon{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;font-size:16px;flex:0 0 42px;color:#fff}
+.tName{font-weight:950;font-size:14px}
+.tMeta{font-size:11px;color:var(--muted);margin-top:3px}
+.teamFoot{display:flex;align-items:center;gap:10px;margin-top:11px}
+.roleBadge{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:950}
+.roleLeader{background:var(--violetS);color:var(--violet)}
+.roleManager{background:var(--orangeS);color:#c46121}
+.roleMember{background:var(--blueS);color:var(--primary)}
+.enterBtn{border-radius:12px;background:#f4f6fb;color:#394058;border:1px solid var(--line);padding:7px 10px;font-weight:950;font-size:12px;cursor:pointer;margin-left:auto}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--line);box-shadow:var(--soft);border-radius:20px;padding:16px}
+.stat b{font-size:26px;font-weight:950;display:block}
+.stat p{font-size:12px;color:var(--muted);font-weight:800;margin:4px 0 0}
+.calBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.76)}
+.monthNav{display:flex;align-items:center;gap:10px}
+.monthNav h2{margin:0;font-size:22px;letter-spacing:-.055em}
+.arrow{width:34px;height:34px;border-radius:12px;background:#fff;border:1px solid var(--line);font-weight:950;color:#62687c;font-size:16px;display:grid;place-items:center;cursor:pointer}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#f7f8fc;border-bottom:1px solid var(--line)}
+.week div{padding:12px 6px;text-align:center;color:#767c90;font-size:12px;font-weight:950}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.day{min-height:116px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;transition:.15s;cursor:pointer}
+.day:nth-child(7n){border-right:0}
+.day:hover{background:#fbfcff}
+.day.dim{background:#fafafa;color:#a3a6b3}
+.dn{font-size:12px;font-weight:950;color:#697083;margin-bottom:6px;display:inline-flex}
+.today .dn{background:linear-gradient(135deg,#2b2346,#46367e);color:#fff;width:26px;height:26px;border-radius:9px;align-items:center;justify-content:center}
+.ev{display:block;max-width:100%;font-size:11px;font-weight:900;padding:4px 7px;border-radius:8px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev.sch{background:var(--blueS);color:var(--primary)}
+.ev.kan{background:var(--greenS);color:var(--green)}
+.ev.mtg{background:var(--orangeS);color:#c46121}
+.ev.ddl{background:var(--roseS);color:var(--rose)}
+.more{font-size:11px;color:var(--muted);font-weight:900;padding-left:3px}
+.rightStack{display:flex;flex-direction:column;gap:10px}
+.agItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;gap:10px;cursor:pointer;box-shadow:var(--soft)}
+.agTime{color:var(--primary);font-size:12px;font-weight:950;min-width:44px}
+.agTitle{font-size:13px;font-weight:950}
+.agSub{font-size:11px;color:var(--muted);margin-top:3px}
+.listCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;box-shadow:var(--soft);cursor:pointer}
+.listCard b{font-size:13px;font-weight:950}
+.listCard p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.mLayer{display:none;position:fixed;inset:0;background:rgba(15,18,33,.48);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:22px}
+.mLayer.open{display:flex}
+.modal{width:min(680px,100%);max-height:88vh;overflow-y:auto;background:#fff;border-radius:26px;box-shadow:0 40px 100px rgba(0,0,0,.25)}
+.mHead{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.mHead h3{margin:0;font-size:20px;letter-spacing:-.04em}
+.mClose{width:34px;height:34px;border-radius:12px;background:#f4f6fb;border:1px solid var(--line);font-size:18px;display:grid;place-items:center;cursor:pointer}
+.mBody{padding:22px}
+.fG{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:2px}
+.f.full{grid-column:1/-1}
+.f label{font-size:12px;font-weight:950;color:#51586f}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-size:14px;background:#fff;outline:none;transition:.15s}
+.f textarea{min-height:90px;resize:vertical}
+.acts{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;flex-wrap:wrap}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.sw{width:34px;height:34px;border-radius:12px;border:3px solid transparent;cursor:pointer;transition:.15s}
+.sw.sel{border-color:#333;transform:scale(1.12)}
+.bigInput{border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:18px;font-weight:950;letter-spacing:.1em;text-align:center;background:#f8f5ff;width:100%;outline:none;transition:.15s;margin-bottom:8px}
+#toast{position:fixed;bottom:28px;right:28px;background:#171a2b;color:#fff;border-radius:18px;padding:14px 18px;font-size:13px;font-weight:900;box-shadow:var(--shadow);z-index:9999;display:none}
+#toast.show{display:block;animation:tup .25s ease}
+@keyframes tup{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.todoItem{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:14px;cursor:pointer;transition:.12s}
+.todoItem.done span{text-decoration:line-through;color:var(--muted)}
+.emptyTeam{padding:20px 10px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:1360px){.homeGrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){.app{padding:12px}.hero{flex-direction:column}.stats{grid-template-columns:1fr 1fr}.fG{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 헤더 -->
+<header class="top">
+  <a class="brand" th:href="@{/main/home}"><div class="mark">TS</div>TeamSync</a>
+  <div class="topR">
+    <span style="font-size:13px;font-weight:850;color:var(--muted)" th:text="${userName}">사용자</span>
+    <form th:action="@{/member/logout}" method="post" id="frm_logout" style="display:none;"></form>
+    <button class="btn" id="btn-logout">로그아웃</button>
+  </div>
+</header>
+
+<!-- 히어로 -->
+<div class="hero">
+  <div>
+    <div class="eyebrow" id="todayLabel"></div>
+    <h1 th:text="'안녕하세요, ' + ${userName} + '님 👋'">안녕하세요 👋</h1>
+    <p>왼쪽에서 참여 중인 팀을 선택하거나, 새 팀을 만들어보세요.</p>
+  </div>
+  <div class="chipRow">
+    <button class="btn primary" onclick="openM('createTeam')">+ 팀 만들기</button>
+    <button class="btn" onclick="openM('joinTeam')">초대코드 입력</button>
+  </div>
+</div>
+
+<!-- 홈 그리드 -->
+<div class="homeGrid">
+  <!-- 내 팀 목록 (실데이터) -->
+  <aside class="panel pad">
+    <div class="head"><div><h2>내 팀</h2><p>참여 중인 팀</p></div>
+      <button class="btn primary" style="padding:7px 11px;font-size:12px" onclick="openM('createTeam')">+</button>
+    </div>
+    <div id="teamList">
+      <div th:if="${#lists.isEmpty(teamSummaries)}" class="emptyTeam">
+        아직 참여 중인 팀이 없어요.<br>팀을 만들거나 초대코드로 참여해보세요.
+      </div>
+      <div class="teamCard" th:each="s : ${teamSummaries}"
+           th:attr="onclick=|location.href='/team/enter/${s.team.team_num}'|">
+        <div class="teamTop">
+          <div class="tIcon" th:style="'background:' + ${s.team.color}">💻</div>
+          <div>
+            <div class="tName" th:text="${s.team.team_name}">팀 이름</div>
+            <div class="tMeta">
+              <span th:text="${s.team.description != null and !#strings.isEmpty(s.team.description)} ? ${s.team.description} : '설명 없음'">설명</span>
+              <span th:text="' · ' + ${s.memberCount} + '명'"></span>
+            </div>
+          </div>
+        </div>
+        <div class="teamFoot">
+          <span class="roleBadge"
+                th:classappend="${s.role == 3 ? 'roleLeader' : (s.role == 2 ? 'roleManager' : 'roleMember')}"
+                th:text="${s.role == 3 ? '팀장' : (s.role == 2 ? '매니저' : '팀원')}">역할</span>
+          <button class="enterBtn"
+                  th:attr="onclick=|event.stopPropagation();location.href='/team/enter/${s.team.team_num}'|">입장 →</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 가운데: 통계 + 캘린더 (목업, 캘린더 모듈 완성 전까지 mock) -->
+  <main>
+    <div class="stats">
+      <div class="stat"><b id="stSch">-</b><p>전체 일정</p></div>
+      <div class="stat"><b th:text="${#lists.size(teamSummaries)}">0</b><p>참여 팀</p></div>
+      <div class="stat"><b id="stToday">-</b><p>오늘 일정</p></div>
+      <div class="stat"><b id="stMin">-</b><p>회의록</p></div>
+    </div>
+    <div class="panel">
+      <div class="calBar">
+        <div class="monthNav">
+          <button class="arrow" onclick="mv(-1)">‹</button>
+          <h2 id="mTitle"></h2>
+          <button class="arrow" onclick="mv(1)">›</button>
+        </div>
+      </div>
+      <div class="week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+      <div id="days" class="days"></div>
+    </div>
+  </main>
+
+  <!-- 우측 (목업, 캘린더/회의록/투두 모듈 완성 전까지 mock) -->
+  <aside>
+    <div class="rightStack">
+      <div class="panel pad">
+        <div class="head"><div><h2>오늘 일정</h2><p>전체 팀 기준</p></div></div>
+        <div id="todayList" class="rightStack"></div>
+      </div>
+      <div class="panel pad">
+        <div class="head"><div><h2>최근 회의록</h2></div></div>
+        <div id="minutesList" class="rightStack"></div>
+      </div>
+      <div class="panel pad">
+        <div class="head"><div><h2>내 To-Do</h2></div><button class="btn" style="padding:6px 10px;font-size:12px" onclick="openM('addTodo')">+ 추가</button></div>
+        <div id="todoList" class="rightStack"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+</div>
+
+<!-- 모달 -->
+<div class="mLayer" id="mLayer" onclick="if(event.target===this)closeM()">
+  <div class="modal" id="modal">
+    <div class="mHead"><h3 id="mTitle2"></h3><button class="mClose" onclick="closeM()">✕</button></div>
+    <div class="mBody" id="mBody"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:inline="javascript">
+/* CSRF 공통 헤더 */
+var csrfToken  = $('meta[name="csrf-token"]').attr('content');
+var csrfHeader = $('meta[name="csrf-header"]').attr('content');
+$(document).ajaxSend(function(e, xhr) {
+    if (csrfHeader) xhr.setRequestHeader(csrfHeader, csrfToken);
+});
+
+$('#btn-logout').on('click', function(){ $('#frm_logout').submit(); });
+
+/* 오늘 날짜 라벨 */
+(function(){
+    var d = new Date();
+    var days = ['일','월','화','수','목','금','토'];
+    document.getElementById('todayLabel').textContent =
+        d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+days[d.getDay()]+'요일';
+})();
+
+/* ====================================================
+   캘린더/투두/회의록 (목업 mock 데이터 - 캘린더/회의록/투두 모듈 완성 전까지 임시)
+==================================================== */
+let curY = new Date().getFullYear(), curM = new Date().getMonth()+1;
+let todos = [
+  {id:1, txt:'(예시) 칸반/캘린더 모듈 연동 대기', done:false, pri:2},
+];
+
+function mv(d){curM+=d;if(curM>12){curM=1;curY++}if(curM<1){curM=12;curY--}renderCal();}
+function renderCal(){
+  document.getElementById('mTitle').textContent = curY+'년 '+curM+'월';
+  const fd=new Date(curY,curM-1,1).getDay(), dim=new Date(curY,curM,0).getDate(), pd=new Date(curY,curM-1,0).getDate();
+  const today=new Date(); const isT=(y,m,d)=>y===today.getFullYear()&&m===(today.getMonth()+1)&&d===today.getDate();
+  let h='';
+  for(let i=0;i<fd;i++) h+='<div class="day dim"><div class="dn">'+(pd-fd+1+i)+'</div></div>';
+  for(let d=1;d<=dim;d++){
+    const tc = isT(curY,curM,d) ? 'today' : '';
+    h += '<div class="day '+tc+'"><div class="dn">'+d+'</div></div>';
+  }
+  const tot=fd+dim, rem = tot%7 ? 7-tot%7 : 0;
+  for(let i=1;i<=rem;i++) h += '<div class="day dim"><div class="dn">'+i+'</div></div>';
+  document.getElementById('days').innerHTML = h;
+}
+function renderTodos(){
+  const priMap = {3:'🔴',2:'🟡',1:'🟢'};
+  document.getElementById('todoList').innerHTML = todos.map(t =>
+    '<div class="todoItem '+(t.done?'done':'')+'" onclick="togTodo('+t.id+')">'+
+    '<span style="font-size:18px">'+(t.done?'✅':'⬜')+'</span>'+
+    '<span style="flex:1;font-size:13px;font-weight:900">'+t.txt+'</span>'+
+    '<span>'+(priMap[t.pri]||'')+'</span></div>'
+  ).join('');
+}
+function togTodo(id){ const t = todos.find(x=>x.id===id); if(t) t.done=!t.done; renderTodos(); }
+document.getElementById('todayList').innerHTML = '<div style="padding:12px;text-align:center;color:var(--muted);font-size:13px">캘린더 모듈 연동 대기 중</div>';
+document.getElementById('minutesList').innerHTML = '<div style="padding:12px;text-align:center;color:var(--muted);font-size:13px">회의록 모듈 연동 대기 중</div>';
+renderCal();
+renderTodos();
+
+/* ====================================================
+   모달
+==================================================== */
+const SWATCHES = ['#f1edff','#eef9f4','#fff5ea','#f5f0ff','#fff1f7','#e8f4ff'];
+let selColor = SWATCHES[0];
+
+function openM(type){
+  document.getElementById('mLayer').classList.add('open');
+  const body = document.getElementById('mBody'), title = document.getElementById('mTitle2');
+
+  if (type === 'createTeam'){
+    title.textContent = '팀 만들기';
+    body.innerHTML =
+      '<div class="fG">'+
+      '<div class="f full"><label>팀 이름 *</label><input id="tN" placeholder="예: FE 개발팀"></div>'+
+      '<div class="f full"><label>팀 설명</label><input id="tD" placeholder="팀에 대한 간단한 설명"></div>'+
+      '<div class="f full"><label>팀 색상 *</label><div class="swatches">'+
+      SWATCHES.map(c => '<div class="sw'+(c===selColor?' sel':'')+'" style="background:'+c+'" onclick="selSw(\''+c+'\',this)"></div>').join('')+
+      '</div></div></div>'+
+      '<div class="acts"><button class="btn" onclick="closeM()">취소</button>'+
+      '<button class="btn primary" onclick="createTeam()">팀 생성</button></div>';
+  } else if (type === 'joinTeam'){
+    title.textContent = '초대코드로 팀 참여';
+    body.innerHTML =
+      '<p style="font-size:14px;color:var(--muted);margin:0 0 14px">팀장에게 받은 초대코드를 입력하세요.</p>'+
+      '<input class="bigInput" id="jCode" placeholder="TS-XXXXXXXX" maxlength="12">'+
+      '<p style="font-size:12px;color:var(--muted);text-align:center">※ 초대코드 기능은 준비 중입니다.</p>'+
+      '<div class="acts"><button class="btn" onclick="closeM()">취소</button>'+
+      '<button class="btn primary" onclick="joinTeam()">팀 참여</button></div>';
+  } else if (type === 'addTodo'){
+    title.textContent = '개인 To-Do 추가';
+    body.innerHTML =
+      '<div class="fG">'+
+      '<div class="f full"><label>할 일 제목 *</label><input id="tdT" placeholder="할 일 입력"></div>'+
+      '<div class="f"><label>우선순위</label><select id="tdP"><option value="1">🟢 낮음</option><option value="2" selected>🟡 보통</option><option value="3">🔴 높음</option></select></div>'+
+      '</div>'+
+      '<p style="font-size:12px;color:var(--muted)">※ To-Do 영구 저장은 마이페이지 모듈 완성 후 연동됩니다.</p>'+
+      '<div class="acts"><button class="btn" onclick="closeM()">취소</button>'+
+      '<button class="btn primary" onclick="saveTodo()">저장</button></div>';
+  }
+}
+function closeM(){ document.getElementById('mLayer').classList.remove('open'); }
+function selSw(c, el){
+  selColor = c;
+  document.querySelectorAll('.sw').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function createTeam(){
+  const name = document.getElementById('tN')?.value.trim();
+  if (!name){ alert('팀 이름을 입력하세요'); return; }
+  const desc = document.getElementById('tD')?.value.trim() || '';
+
+  $.post('/team/create', { teamName: name, description: desc, color: selColor })
+    .done(function(result){
+      if (result && result.indexOf('OK:') === 0){
+        const teamNum = result.split(':')[1];
+        closeM();
+        showToast('팀이 생성되었습니다! 🎉');
+        location.href = '/team/enter/' + teamNum;
+      } else {
+        showToast('팀 생성에 실패했습니다. (' + result + ')');
+      }
+    })
+    .fail(function(){ showToast('요청 처리 중 오류가 발생했습니다.'); });
+}
+function joinTeam(){
+  const c = document.getElementById('jCode')?.value.trim();
+  if (!c){ alert('초대코드를 입력하세요'); return; }
+  closeM();
+  showToast('초대코드 기능은 준비 중입니다.');
+}
+function saveTodo(){
+  const t = document.getElementById('tdT')?.value.trim();
+  if (!t){ alert('제목을 입력하세요'); return; }
+  todos.unshift({ id: Date.now(), txt: t, done: false, pri: Number(document.getElementById('tdP')?.value) || 2 });
+  closeM();
+  renderTodos();
+  showToast('To-Do 추가 완료. (임시 저장, 새로고침 시 사라짐)');
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>팀 대시보드</title>
+    <th:block layout:fragment="pageCss">
+        <style>
+            :root{--primary:#6c5ce7;--violet:#8f65f6;--rose:#e46aa1;--green:#34b77b;--orange:#f0a04b;--muted:#7b7394;--line:#e8e1fb;--ink:#1e1635;--blueS:#f1edff;--greenS:#eef9f4;--orangeS:#fff5ea;--violetS:#f5f0ff;--roseS:#fff1f7;--shadow:0 16px 44px rgba(73,47,133,.12);--soft:0 8px 22px rgba(73,47,133,.08);--r:24px}
+            .panel{background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);border-radius:var(--r);overflow:hidden}
+            .pad{padding:20px}
+            .head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+            .head h2{font-size:18px;margin:0;letter-spacing:-.04em}
+            .head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+            .btn{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;font-weight:900;background:#fff;color:#42485b;cursor:pointer;transition:.15s}
+            .btn.primary{background:linear-gradient(135deg,var(--primary),#7476ff);border:0;color:#fff}
+            .btn.danger{background:var(--roseS);color:var(--rose);border-color:rgba(228,106,161,.3)}
+            .btn:hover{transform:translateY(-1px)}
+            .stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+            .stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--soft)}
+            .stat .val{font-size:28px;font-weight:950;letter-spacing:-.04em}
+            .stat .lbl{font-size:12px;color:var(--muted);font-weight:800;margin-top:4px}
+            .stat .diff{font-size:11px;font-weight:900;margin-top:3px}
+            .up{color:var(--green)}
+            .dbGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+            .calBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+            .monthNav{display:flex;align-items:center;gap:10px}
+            .monthNav h2{margin:0;font-size:20px;letter-spacing:-.05em}
+            .arrow{width:32px;height:32px;border-radius:12px;background:#fff;border:1px solid var(--line);color:#62687c;font-size:16px;display:grid;place-items:center;cursor:pointer}
+            .chipRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+            .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#5e6578;font-weight:900;font-size:11px;cursor:pointer}
+            .chip.active{background:linear-gradient(135deg,#2b2346,#46367e);border-color:#2b2346;color:#fff}
+            .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#f7f8fc;border-bottom:1px solid var(--line)}
+            .week div{padding:10px 6px;text-align:center;color:#767c90;font-size:11px;font-weight:950}
+            .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+            .day{min-height:80px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px;cursor:pointer}
+            .day:nth-child(7n){border-right:0}
+            .day:hover{background:#fbfcff}
+            .day.dim{background:#fafafa;color:#a3a6b3}
+            .dn{font-size:11px;font-weight:950;color:#697083;margin-bottom:5px;display:inline-flex}
+            .today .dn{background:linear-gradient(135deg,#2b2346,#46367e);color:#fff;width:24px;height:24px;border-radius:9px;align-items:center;justify-content:center}
+            .ev{display:block;font-size:10px;font-weight:900;padding:3px 6px;border-radius:7px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            .ev.sch{background:var(--blueS);color:var(--primary)}.ev.kan{background:var(--greenS);color:var(--green)}.ev.mtg{background:var(--orangeS);color:#c46121}.ev.ddl{background:var(--roseS);color:var(--rose)}
+            .more{font-size:10px;color:var(--muted);font-weight:900}
+            .agendaItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;gap:10px;box-shadow:var(--soft);margin-bottom:8px;cursor:pointer}
+            .agTime{color:var(--primary);font-size:12px;font-weight:950;min-width:48px}
+            .agTitle{font-size:13px;font-weight:950}
+            .agSub{font-size:11px;color:var(--muted);margin-top:2px}
+            .noticeItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--soft);margin-bottom:10px;cursor:pointer}
+            .noticeItem.pinned{border-left:3px solid var(--primary)}
+            .noticeTitle{font-size:14px;font-weight:950;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+            .pinnedBadge{background:var(--blueS);color:var(--primary);border-radius:999px;padding:2px 7px;font-size:10px;font-weight:950}
+            .newBadge{background:var(--roseS);color:var(--rose);border-radius:999px;padding:2px 7px;font-size:10px;font-weight:950}
+            .noticeMeta{font-size:11px;color:var(--muted)}
+            .miniLanes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+            .lane{background:#f8f9fc;border:1px solid var(--line);border-radius:16px;padding:10px}
+            .laneHead{font-size:12px;font-weight:950;margin-bottom:8px;display:flex;justify-content:space-between}
+            .cnt{background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:10px;color:var(--muted)}
+            .kCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px;margin-bottom:7px;font-size:12px;font-weight:900;cursor:pointer}
+            .kCard:hover{border-color:rgba(108,92,231,.3);transform:translateY(-1px)}
+            .kTag{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:950;margin-bottom:5px}
+            .deadline{font-size:10px;color:var(--muted);margin-top:5px}
+            .deadline.over{color:var(--rose);font-weight:900}
+            .memberRow{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:8px}
+            .mAv{width:34px;height:34px;border-radius:12px;background:var(--blueS);color:var(--primary);display:grid;place-items:center;font-weight:950;font-size:14px;flex:0 0 34px}
+            .mName{font-size:13px;font-weight:950}
+            .mRole{font-size:11px;color:var(--muted);margin-top:2px}
+            .roleBadge{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:950}
+            .roleLeader{background:var(--violetS);color:var(--violet)}
+            .roleManager{background:var(--orangeS);color:#c46121}
+            .roleMember{background:var(--blueS);color:var(--primary)}
+            .progressBar{height:10px;background:#eef1f7;border-radius:999px;overflow:hidden;margin-top:6px}
+            .progressBar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--violet))}
+            .teamMain{display:flex;flex-direction:column;gap:20px}
+            .mLayer{display:none;position:fixed;inset:0;background:rgba(15,18,33,.48);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:22px}
+            .mLayer.open{display:flex}
+            .modal{width:min(680px,100%);max-height:88vh;overflow-y:auto;background:#fff;border-radius:26px;box-shadow:0 40px 100px rgba(0,0,0,.25)}
+            .mHead{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+            .mHead h3{margin:0;font-size:20px;letter-spacing:-.04em}
+            .mClose{width:34px;height:34px;border-radius:12px;background:#f4f6fb;border:1px solid var(--line);font-size:18px;display:grid;place-items:center;cursor:pointer}
+            .mBody{padding:22px}
+            .fG{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+            .f{display:flex;flex-direction:column;gap:6px;margin-bottom:2px}
+            .f.full{grid-column:1/-1}
+            .f label{font-size:12px;font-weight:950;color:#51586f}
+            .f input,.f select,.f textarea{border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-size:14px;background:#fff;outline:none;transition:.15s}
+            .f input:focus,.f select:focus,.f textarea:focus{border-color:rgba(108,92,231,.45);box-shadow:0 0 0 4px rgba(108,92,231,.08)}
+            .f textarea{min-height:90px;resize:vertical}
+            .acts{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;flex-wrap:wrap}
+            #toast{position:fixed;bottom:28px;right:28px;background:#171a2b;color:#fff;border-radius:18px;padding:14px 18px;font-size:13px;font-weight:900;box-shadow:var(--shadow);z-index:9999;display:none}
+            #toast.show{display:block}
+            @media(max-width:1100px){.stats4{grid-template-columns:repeat(2,1fr)}.dbGrid{grid-template-columns:1fr}.miniLanes{grid-template-columns:repeat(2,1fr)}}
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content" th:with="currentMenu='dashboard'">
+
+    <main class="teamMain">
+
+        <!-- 통계 카드 -->
+        <div class="stats4">
+            <div class="stat"><div class="val">12</div><div class="lbl">이번 달 일정</div><div class="diff up">↑ 전월 +3</div></div>
+            <div class="stat"><div class="val">8</div><div class="lbl">완료 칸반 카드</div><div class="diff up">↑ +2</div></div>
+            <div class="stat"><div class="val">234</div><div class="lbl">총 채팅 수</div></div>
+            <div class="stat"><div class="val">6</div><div class="lbl">활성 팀원 수</div></div>
+        </div>
+
+        <!-- 캘린더 + 다가오는 일정 -->
+        <div class="dbGrid">
+            <div class="panel">
+                <div class="calBar">
+                    <div class="monthNav">
+                        <button class="arrow" onclick="mv(-1)">‹</button>
+                        <h2 id="mTitle">2026년 6월</h2>
+                        <button class="arrow" onclick="mv(1)">›</button>
+                    </div>
+                    <div class="chipRow">
+                        <button class="chip active" onclick="setViewType('ALL',this)">전체</button>
+                        <button class="chip" onclick="setViewType('SCHEDULE',this)">일정</button>
+                        <button class="chip" onclick="setViewType('KANBAN',this)">칸반</button>
+                    </div>
+                </div>
+                <div class="week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+                <div id="days" class="days"></div>
+            </div>
+            <div class="panel pad">
+                <div class="head">
+                    <div><h2>다가오는 일정</h2><p>가까운 순서</p></div>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn primary" onclick="openM('addSch')">+ 팀 일정</button>
+                        <a th:href="@{/calendar/list}"><button class="btn">전체 보기</button></a>
+                    </div>
+                </div>
+                <div id="upcomingList"></div>
+                <div class="head" style="margin-top:16px"><div><h2>최근 공지</h2></div><a th:href="@{/notice/list}"><button class="btn">전체 보기</button></a></div>
+                <div id="noticeList"></div>
+            </div>
+        </div>
+
+        <!-- 칸반 요약 + 팀원 -->
+        <div class="dbGrid">
+            <div class="panel pad">
+                <div class="head"><div><h2>칸반 보드 요약</h2><p>진행률 67%</p></div><a th:href="@{/kanban/board}"><button class="btn">전체 보기</button></a></div>
+                <div class="progressBar"><i style="width:67%"></i></div>
+                <div class="miniLanes" id="miniKanban"></div>
+            </div>
+            <div class="panel pad">
+                <div class="head"><div><h2>팀원 현황</h2></div><a th:href="@{/member/list}"><button class="btn">전체 보기</button></a></div>
+                <div id="memberList"></div>
+            </div>
+        </div>
+
+        <!-- 차트 -->
+        <div class="dbGrid">
+            <div class="panel pad">
+                <div class="head"><div><h2>일정 수 추이</h2><p>주별 라인 차트</p></div></div>
+                <canvas id="chartLine" height="140"></canvas>
+            </div>
+            <div class="panel pad">
+                <div class="head"><div><h2>팀원별 완료 카드</h2><p>바 차트</p></div></div>
+                <canvas id="chartBar" height="140"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- 모달 -->
+    <div class="mLayer" id="mLayer" onclick="if(event.target===this)closeM()">
+        <div class="modal">
+            <div class="mHead"><h3 id="mTitle2"></h3><button class="mClose" onclick="closeM()">✕</button></div>
+            <div class="mBody" id="mBody"></div>
+        </div>
+    </div>
+    <div id="toast"></div>
+
+</div>
+
+<th:block layout:fragment="pageJs">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script>
+        let curY=2026,curM=6,viewType='ALL';
+        const scheds=[
+            {id:1,title:'FE 주간 회의',date:'2026-06-22',type:'mtg'},{id:2,title:'배포 마감',date:'2026-06-25',type:'ddl'},
+            {id:3,title:'API 명세 검토',date:'2026-06-28',type:'sch'},{id:4,title:'7월 스프린트',date:'2026-07-01',type:'sch'},
+            {id:5,title:'코드 리뷰',date:'2026-06-15',type:'sch'},{id:6,title:'칸반 마감',date:'2026-06-20',type:'kan'},
+        ];
+        const kanban=[
+            {id:1,title:'로그인 API 연동',status:'DOING',tag:'FE',deadline:'2026-06-25',assignees:['홍','김']},
+            {id:2,title:'캘린더 UI 구현',status:'TODO',tag:'FE',deadline:'2026-06-28',assignees:['이']},
+            {id:3,title:'DB 스키마 확정',status:'DONE',tag:'BE',deadline:'2026-06-20',assignees:['박']},
+            {id:4,title:'디자인 시스템',status:'REVIEW',tag:'UX',deadline:'2026-06-22',assignees:['최']},
+            {id:5,title:'채팅 WebSocket',status:'DOING',tag:'BE',deadline:'2026-06-30',assignees:['홍','이']},
+            {id:6,title:'알림 스케줄러',status:'TODO',tag:'BE',deadline:'2026-07-05',assignees:['김']},
+        ];
+        const notices=[
+            {id:1,title:'6월 개발 일정 공유',date:'2026-06-20',author:'홍영준',pinned:true,read:false,views:12},
+            {id:2,title:'코드 컨벤션 업데이트',date:'2026-06-18',author:'이서연',pinned:false,read:true,views:8},
+        ];
+        const members=[
+            {id:1,name:'홍영준',role:'LEADER',lastActive:'방금',done:11},
+            {id:2,name:'김민준',role:'MEMBER',lastActive:'1시간 전',done:8},
+            {id:3,name:'이서연',role:'MANAGER',lastActive:'30분 전',done:6},
+            {id:4,name:'박지훈',role:'MEMBER',lastActive:'3시간 전',done:4},
+            {id:5,name:'최유진',role:'MEMBER',lastActive:'어제',done:2},
+            {id:6,name:'정다은',role:'MEMBER',lastActive:'2일 전',done:1},
+        ];
+
+        function roleBadge(r){const m={LEADER:['roleLeader','팀장'],MANAGER:['roleManager','매니저'],MEMBER:['roleMember','팀원']};const[c,t]=m[r]||m.MEMBER;return`<span class="roleBadge ${c}">${t}</span>`;}
+        function mv(d){curM+=d;if(curM>12){curM=1;curY++}if(curM<1){curM=12;curY--}renderCal();}
+        function setViewType(t,el){viewType=t;document.querySelectorAll('.calBar .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderCal();}
+        function renderCal(){
+            document.getElementById('mTitle').textContent=`${curY}년 ${curM}월`;
+            const fd=new Date(curY,curM-1,1).getDay(),dim=new Date(curY,curM,0).getDate(),pd=new Date(curY,curM-1,0).getDate();
+            const today=new Date();const isT=(y,m,d)=>y===today.getFullYear()&&m===(today.getMonth()+1)&&d===today.getDate();
+            let h='';
+            for(let i=0;i<fd;i++)h+=`<div class="day dim"><div class="dn">${pd-fd+1+i}</div></div>`;
+            for(let d=1;d<=dim;d++){
+                const ds=`${curY}-${String(curM).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                let evs=scheds.filter(s=>s.date===ds);
+                if(viewType==='SCHEDULE')evs=evs.filter(s=>s.type!=='kan');
+                if(viewType==='KANBAN')evs=evs.filter(s=>s.type==='kan');
+                const tc=isT(curY,curM,d)?'today':'';
+                let ev=evs.slice(0,2).map(s=>`<span class="ev ${s.type}">${s.title}</span>`).join('');
+                if(evs.length>2)ev+=`<span class="more">+${evs.length-2}</span>`;
+                h+=`<div class="day ${tc}"><div class="dn">${d}</div>${ev}</div>`;
+            }
+            const tot=fd+dim,rem=tot%7?7-tot%7:0;
+            for(let i=1;i<=rem;i++)h+=`<div class="day dim"><div class="dn">${i}</div></div>`;
+            document.getElementById('days').innerHTML=h;
+        }
+        function renderUpcoming(){
+            const today=new Date().toISOString().slice(0,10);
+            const upcoming=scheds.filter(s=>s.date>=today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+            document.getElementById('upcomingList').innerHTML=upcoming.map(s=>`
+                <div class="agendaItem">
+                    <div class="agTime">${s.date.slice(5)}</div>
+                    <div><div class="agTitle">${s.title}</div><div class="agSub">${{sch:'일정',mtg:'회의',ddl:'마감',kan:'칸반'}[s.type]||''}</div></div>
+                </div>`).join('');
+        }
+        function renderNotices(){
+            document.getElementById('noticeList').innerHTML=notices.map(n=>`
+                <div class="noticeItem ${n.pinned?'pinned':''}">
+                    <div class="noticeTitle">
+                        ${n.pinned?'<span class="pinnedBadge">📌 고정</span>':''}
+                        ${!n.read?'<span class="newBadge">NEW</span>':''}
+                        ${n.title}
+                    </div>
+                    <div class="noticeMeta">${n.author} · ${n.date} · 조회 ${n.views}</div>
+                </div>`).join('');
+        }
+        function renderMiniKanban(){
+            const lanes=[{k:'TODO',label:'할 일'},{k:'DOING',label:'진행 중'},{k:'REVIEW',label:'검토 중'},{k:'DONE',label:'완료'}];
+            const tagColors={FE:['#f1edff','#6c5ce7'],BE:['#eef9f4','#34b77b'],UX:['#fff5ea','#c46121']};
+            document.getElementById('miniKanban').innerHTML=lanes.map(l=>{
+                const cards=kanban.filter(c=>c.status===l.k);
+                return`<div class="lane">
+                    <div class="laneHead">${l.label}<span class="cnt">${cards.length}</span></div>
+                    ${cards.map(c=>{
+                        const[bg,tc]=tagColors[c.tag]||['#f4f6fb','#555'];
+                        const over=c.deadline<new Date().toISOString().slice(0,10);
+                        return`<div class="kCard">
+                            <span class="kTag" style="background:${bg};color:${tc}">${c.tag}</span>
+                            <div>${c.title}</div>
+                            <div class="deadline ${over?'over':''}">${over?'⚠ ':''} ~${c.deadline}</div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }).join('');
+        }
+        function renderMembers(){
+            document.getElementById('memberList').innerHTML=members.map(m=>`
+                <div class="memberRow">
+                    <div class="mAv">${m.name[0]}</div>
+                    <div style="flex:1"><div class="mName">${m.name} ${roleBadge(m.role)}</div><div class="mRole">완료 ${m.done}개 · ${m.lastActive}</div></div>
+                </div>`).join('');
+        }
+        function renderCharts(){
+            const lc=document.getElementById('chartLine');
+            if(lc._chart)lc._chart.destroy();
+            lc._chart=new Chart(lc,{type:'line',data:{labels:['1주','2주','3주','4주'],datasets:[{label:'일정',data:[3,5,2,4],borderColor:'#6c5ce7',backgroundColor:'rgba(108,92,231,.1)',fill:true,tension:.4,pointBackgroundColor:'#6c5ce7'}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+            const bc=document.getElementById('chartBar');
+            if(bc._chart)bc._chart.destroy();
+            bc._chart=new Chart(bc,{type:'bar',data:{labels:members.map(m=>m.name),datasets:[{label:'완료',data:members.map(m=>m.done),backgroundColor:'rgba(108,92,231,.7)',borderRadius:8}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+        }
+        function renderAll(){renderCal();renderUpcoming();renderNotices();renderMiniKanban();renderMembers();renderCharts();}
+        function openM(type,data){
+            document.getElementById('mLayer').classList.add('open');
+            const body=document.getElementById('mBody'),title=document.getElementById('mTitle2');
+            if(type==='addSch'){
+                title.textContent='일정 등록';
+                body.innerHTML=`<div class="fG">
+                    <div class="f full"><label>제목 *</label><input id="sT" placeholder="일정 제목"/></div>
+                    <div class="f"><label>시작일</label><input type="date" id="sS" value="${data||'2026-06-22'}"/></div>
+                    <div class="f"><label>종료일</label><input type="date" id="sE" value="${data||'2026-06-22'}"/></div>
+                    <div class="f full"><label>내용</label><textarea id="sCo" placeholder="일정 상세 내용"></textarea></div>
+                </div>
+                <div class="acts"><button class="btn" onclick="closeM()">취소</button><button class="btn primary" onclick="saveSch()">저장</button></div>`;
+            }
+        }
+        function closeM(){document.getElementById('mLayer').classList.remove('open');}
+        function saveSch(){
+            const t=document.getElementById('sT')?.value.trim();
+            if(!t){alert('제목을 입력하세요');return;}
+            scheds.push({id:Date.now(),title:t,date:document.getElementById('sS')?.value,type:'sch'});
+            closeM();renderAll();
+        }
+        renderAll();
+    </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>카드 추가</title>
+</head>
+<body>
+<div class="fGrid">
+    <h2>카드 추가</h2>
+    <form id="kanban_card_form" enctype="multipart/form-data">
+        <ul>
+            <li>
+                <label>카드 제목 <span style="color: var(--ts-rose)">*</span></label>
+                <input type="text" id="title" name="title" placeholder="카드 제목을 입력하세요" required>
+            </li>       
+            <li>
+                <label>상세 내용</label>
+                <textarea id="content" name="content" placeholder="업무 내용을 상세히 적어주세요"></textarea>
+            </li>       
+            <li>
+                <label>태그</label>
+                <input type="text" id="tag" name="tag" placeholder="예: Backend, UI (쉼표로 구분)">
+            </li>
+            <li>
+                <label>마감일</label>
+                <input type="date" id="due_date" name="due_date">
+            </li>
+            <li>
+                <label>담당자 지정</label>
++                <select id="assignee_nums" name="assignee_nums" class="form-control select2" multiple="multiple"></select>
+            </li>
+            
+            <!-- 6. 파일 업로드 -->
+            <li>
+                <label>파일 업로드</label>
+                <input type="file" name="upload" id="upload">
+            </li>       
+        </ul>
+        
+        <div class="align-center">
+            <button type="button" id="btn_submit_card" class="ts-btn" style="background: var(--ts-primary); color: #fff;">카드추가</button>
+            <button type="button" id="btn_close_modal" class="ts-btn">취소</button>
+        </div>
+    </form>
+</div>
+</body>
+</html> 

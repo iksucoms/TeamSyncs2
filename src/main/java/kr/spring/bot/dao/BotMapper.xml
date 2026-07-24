@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.bot.dao.BotMapper">
+
+    <!-- resultMap -->
+    <resultMap id="botLogResultMap" type="kr.spring.bot.vo.BotLogVO">
+        <id     property="bot_num"  column="BOT_NUM"/>
+        <result property="user_num" column="USER_NUM"/>
+        <result property="team_num" column="TEAM_NUM"/>
+        <result property="message"  column="MESSAGE"/>
+        <result property="sender"   column="SENDER"/>
+        <result property="reg_date" column="REG_DATE"/>
+    </resultMap>
+
+    <!-- 챗봇 로그 1건 저장 (sender: 1=사용자, 2=챗봇) -->
+    <insert id="insertLog" parameterType="kr.spring.bot.vo.BotLogVO">
+        <selectKey keyProperty="bot_num" resultType="long" order="BEFORE">
+            SELECT SEQ_BOT_LOG.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO BOT_LOG (
+            BOT_NUM, USER_NUM, TEAM_NUM, MESSAGE, SENDER, REG_DATE
+        ) VALUES (
+            #{bot_num}, #{user_num}, #{team_num}, #{message}, #{sender}, SYSDATE
+        )
+    </insert>
+
+    <!-- 특정 팀 안에서 사용자의 대화 이력 조회 (최근 50건을 가져온 뒤 오래된순으로 재정렬) -->
+    <select id="selectHistory" resultMap="botLogResultMap">
+        SELECT * FROM (
+            SELECT * FROM (
+                SELECT BOT_NUM, USER_NUM, TEAM_NUM, MESSAGE, SENDER, REG_DATE
+                FROM BOT_LOG
+                WHERE USER_NUM = #{user_num}
+                  AND TEAM_NUM = #{team_num}
+                ORDER BY REG_DATE DESC, BOT_NUM DESC
+            )
+            WHERE ROWNUM &lt;= 50
+        )
+        ORDER BY REG_DATE ASC, BOT_NUM ASC
+    </select>
+</mapper>

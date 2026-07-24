@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.users.dao.UsersMapper">
+
+	<!-- 공통 resultMap -->
+	<resultMap id="usersResultMap"
+		type="kr.spring.users.vo.UsersVO">
+		<id property="user_num" column="USER_NUM" />
+		<result property="email" column="EMAIL" />
+		<result property="passwd" column="PASSWD" />
+		<result property="user_name" column="USER_NAME" />
+		<result property="phone" column="PHONE" />
+		<result property="birth" column="BIRTH" />
+		<result property="intro" column="INTRO" />
+		<result property="photo" column="PHOTO" />
+		<result property="photo_name" column="PHOTO_NAME" />
+		<result property="auth" column="AUTH" />
+		<result property="login_type" column="LOGIN_TYPE" />
+		<result property="google_id" column="GOOGLE_ID" />
+		<result property="status" column="STATUS" />
+		<result property="withdraw_date" column="WITHDRAW_DATE" />
+		<result property="reg_date" column="REG_DATE" />
+		<result property="modify_date" column="MODIFY_DATE" />
+	</resultMap>
+
+	<!-- user_num으로 조회 -->
+	<select id="selectByUserNum" parameterType="long"
+		resultMap="usersResultMap">
+		SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, PHONE,
+		AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE, MODIFY_DATE
+		FROM USERS
+		WHERE USER_NUM = #{userNum}
+	</select>
+
+	<!-- email로 조회 -->
+	<select id="selectByEmail" parameterType="string"
+		resultMap="usersResultMap">
+		SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, PHONE,
+		AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE, MODIFY_DATE
+		FROM USERS
+		WHERE EMAIL = #{email}
+	</select>
+
+	<!-- 이메일 중복 확인 -->
+	<select id="countByEmail" parameterType="string"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE EMAIL = #{email}
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="insertUser"
+		parameterType="kr.spring.users.vo.UsersVO">
+		INSERT INTO USERS (
+		USER_NUM,
+		EMAIL,
+		PASSWD,
+		USER_NAME,
+		AUTH,
+		LOGIN_TYPE,
+		STATUS,
+		REG_DATE
+		) VALUES (
+		SEQ_USERS.NEXTVAL,
+		#{email},
+		#{passwd},
+		#{user_name},
+		#{auth},
+		#{login_type},
+		#{status},
+		SYSDATE
+		)
+	</insert>
+</mapper>

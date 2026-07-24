@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TeamSync - 로그인/회원가입</title>
+  <link rel="stylesheet" th:href="@{/assets/css/SY/member.login.css}"/>
+ <link rel="stylesheet" th:href="@{/assets/css/Chatbot.css}"/>
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+<div class="sy-member-page">
+  <div class="sy-member-card">
+    <div class="sy-brand">
+      <a th:href="@{/}">
+        <div class="sy-brand-mark">TS</div>
+        <span>TeamSync</span>
+      </a>
+    </div>
+
+    <div class="sy-tabs">
+      <button class="sy-tab sy-on" type="button" data-target="sy-login">로그인</button>
+      <button class="sy-tab" type="button" data-target="sy-signup">회원가입</button>
+    </div>
+
+    <!-- 로그인 -->
+    <div id="sy-login" class="sy-pane sy-on">
+      <div class="sy-signup-title">
+        <h2 class="sy-title">TeamSync</h2>
+        <span class="sy-rocket">🚀</span>
+      </div>
+      <p class="sy-sub">로그인 후 팀과 함께 효율적인 업무를 경험하세요.</p>
+
+      <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error'}">
+        이메일 또는 비밀번호가 일치하지 않습니다.
+      </div>
+      <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error_suspended'}">
+        정지된 계정입니다.
+      </div>
+      <div class="sy-msg sy-msg-success" th:if="${signupSuccess != null}" th:text="${signupSuccess}"></div>
+
+      <form th:action="@{/member/login}" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="sy-field">
+          <label>이메일</label>
+          <input type="email" name="email" placeholder="hello@example.com" autocomplete="off"/>
+        </div>
+
+        <div class="sy-field">
+          <label>비밀번호</label>
+          <input type="password" name="passwd" placeholder="비밀번호"/>
+        </div>
+
+        <div class="sy-login-row">
+          <label>
+            <input type="checkbox" name="remember-me"/>
+            <span>로그인 유지</span>
+          </label>
+        </div>
+
+        <button type="submit" class="sy-btn sy-btn-primary">로그인</button>
+      </form>
+    </div>
+
+    <!-- 회원가입 -->
+    <div id="sy-signup" class="sy-pane">
+      <div class="sy-signup-title">
+        <h2 class="sy-title">TeamSync</h2>
+        <span class="sy-rocket">🚀</span>
+      </div>
+      <p class="sy-sub">회원가입 후 팀과 함께 효율적인 업무를 경험하세요.</p>
+
+      <div class="sy-msg sy-msg-error" th:if="${signupError != null}" th:text="${signupError}"></div>
+				<form th:action="@{/users/signup}" method="post" id="sy-signup-form">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+					<div class="sy-field">
+						<label>닉네임 <span class="sy-required">*</span></label> <input
+							type="text" name="user_name" id="sy-signup-user-name"
+							placeholder="예: 홍영준" autocomplete="off" />
+						<p class="sy-hint">서비스 내 표시 이름</p>
+					</div>
+
+					<div class="sy-field">
+						<label>이메일 <span class="sy-required">*</span></label>
+						<div class="sy-email-row">
+							<input type="email" name="email" id="sy-signup-email"
+								placeholder="hello@example.com" autocomplete="off" />
+							<button type="button" class="sy-btn sy-btn-check"
+								id="sy-btn-check-email">중복확인</button>
+						</div>
+						<div class="sy-check-msg" id="sy-email-check-msg"></div>
+						<div class="sy-field sy-verification-box"
+							id="sy-email-verification-box">
+							<label>이메일 인증코드 <span class="sy-required">*</span></label>
+							<div class="sy-email-row">
+								<input type="text" id="sy-email-code" placeholder="인증코드 입력"
+									autocomplete="off" />
+								<button type="button" class="sy-btn sy-btn-check"
+									id="sy-btn-verify-email">인증확인</button>
+							</div>
+							<div class="sy-code-info">
+								<span id="sy-email-code-msg">메일로 전송된 인증코드를 입력해주세요.</span> <span
+									id="sy-email-timer">05:00</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="sy-form-grid">
+						<div class="sy-field">
+							<label>비밀번호 <span class="sy-required">*</span></label> <input
+								type="password" name="passwd" id="sy-signup-passwd"
+								placeholder="8~20자" />
+						</div>
+
+						<div class="sy-field">
+							<label>비밀번호 확인 <span class="sy-required">*</span></label> <input
+								type="password" name="confirm_passwd"
+								id="sy-signup-confirm-passwd" placeholder="동일하게 입력" />
+						</div>
+					</div>
+
+					<div class="sy-terms">
+						<label class="sy-term-line sy-term-all"> <input
+							type="checkbox" id="sy-agree-all" /> <span>전체 동의</span>
+						</label> <label class="sy-term-line"> <input type="checkbox"
+							class="sy-required-term" /> <span>서비스 이용약관 동의</span> <span
+							class="sy-term-badge">필수</span>
+							<button type="button" class="sy-term-view">보기</button>
+						</label> <label class="sy-term-line"> <input type="checkbox"
+							class="sy-required-term" /> <span>개인정보 처리방침 동의</span> <span
+							class="sy-term-badge">필수</span>
+							<button type="button" class="sy-term-view">보기</button>
+						</label> <label class="sy-term-line"> <input type="checkbox"
+							class="sy-optional-term" /> <span>마케팅 수신 동의</span> <span
+							class="sy-term-badge sy-term-choice">선택</span>
+							<button type="button" class="sy-term-view">보기</button>
+						</label>
+					</div>
+
+					<button type="submit" class="sy-btn sy-btn-primary">회원가입</button>
+
+					<div class="sy-divider">또는</div>
+
+					<button type="button" class="sy-btn sy-btn-google"
+						id="sy-btn-google">
+						<span class="sy-google-mark">G</span> <span>Google로 계속하기</span>
+					</button>
+				</form>
+			</div>
+  </div>
+</div>
+
+<th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/SY/member.login.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+</body>
+</html>

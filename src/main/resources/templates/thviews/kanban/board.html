@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+   	  xmlns:sec="http://www.thymeleaf.org/extra/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+<title>kanban</title>
+<link rel="stylesheet" th:href="@{/assets/css/kanban.css}" type="text/css">
+<script type="text/javascript" th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/assets/js/kanban.js}"></script>
+</head>
+<body>
+<div layout:fragment="content" th:with="currentMenu='kanban'">
+	<!-- 메인 -->
+	  <main>
+	    <section class="panel kanbanWrap">
+	      <!-- 헤더 -->
+	      <div class="kanbanTop">
+	        <div class="kanbanTopLeft">
+	          <h2>📋 칸반 보드</h2>
+	          <p>카드를 드래그해서 상태 변경 · 클릭해서 상세 확인</p>
+	          <div class="legendRow">
+	            <span class="chip" style="cursor:default;background:var(--blueS);color:var(--primary);border-color:transparent">드래그로 이동</span>
+	            <span class="chip" style="cursor:default;background:var(--violetS);color:var(--violet);border-color:transparent">클릭으로 상세</span>
+	            <span class="chip" style="cursor:default;background:var(--roseS);color:var(--rose);border-color:transparent">⚠️ 마감 임박</span>
+	            <span class="chip" style="cursor:default;background:var(--greenS);color:var(--green);border-color:transparent">📅 캘린더 자동 연동</span>
+	          </div>
+	        </div>
+	        <div class="kanbanTopRight">
+	          <button class="btn" id="myOnlyBtn" onclick="toggleMyOnly()">내 카드만</button>
+	          <button class="btn" onclick="location.href='04_calendar.html'">📅 캘린더</button>
+	          <button class="btn primary" sec:authorize="isAuthenticated()" onclick="location.href='write'">+ 카드 추가</button>
+	        </div>
+	      </div>
+	
+	      <!-- 전체 진행률 -->
+	      <div class="totalProg">
+	        <div class="totalProgTop">
+	          <span>전체 진행률</span>
+	          <span id="progText">계산 중...</span>
+	        </div>
+	        <div class="totalBar"><div class="totalFill" id="progFill" style="width:0%"></div></div>
+	      </div>
+	
+	      <!-- 필터 -->
+	      <div class="filterBar">
+	        <span class="filterLabel">태그:</span>
+	        <button class="chip on" id="fAll" onclick="setTag(null,this)">전체</button>
+	        <button class="chip" style="background:var(--blueS);color:var(--primary);border-color:transparent" onclick="setTag('UI',this)">UI</button>
+	        <button class="chip" style="background:var(--greenS);color:var(--green);border-color:transparent" onclick="setTag('개발',this)">개발</button>
+	        <button class="chip" style="background:var(--violetS);color:var(--violet);border-color:transparent" onclick="setTag('기능',this)">기능</button>
+	        <button class="chip" style="background:var(--orangeS);color:#c46121;border-color:transparent" onclick="setTag('인증',this)">인증</button>
+	        <button class="chip" style="background:var(--roseS);color:var(--rose);border-color:transparent" onclick="setTag('API',this)">API</button>
+	        <input class="searchBox" id="kSearch" placeholder="🔍 카드 검색..." oninput="render()">
+	      </div>
+	
+	      <!-- 레인 4개 -->
+	      <div class="laneGrid" id="board"></div>
+	    </section>
+	  </main>
+	</div>
+	
+	<!-- 모달 -->
+	<div class="mLayer" id="mLayer" onclick="if(event.target===this)closeModal()">
+	  <div class="modal" id="modal">
+	    <div class="mHead">
+	      <h3 id="mTitle"></h3>
+	      <button class="mClose" onclick="closeModal()">✕</button>
+	    </div>
+	    <div class="mBody" id="mBody"></div>
+	  </div>
+	</div>
+	<div id="toast"></div>
+</body>
+</html>

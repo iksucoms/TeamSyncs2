@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="kr.spring.chat.dao.ChatMapper"> 
+	 <select id="selectChannelList" resultType="ChatChannelVO">
+	 	select
+	 		c.channel_num,
+	 		c.team_num,
+	 		c.channel_name,
+	 		c.category,
+	 		c.channel_desc,
+	 		c.is_default,
+	 		<!-- 안읽은 메시지 개수 (내 읽음 상태 테이블과 비교) -->
+	 		(select count(*)
+	 		 from chat_message m
+	 		 where m.channel_num = c.channel_num
+	 		 and m.message_num > rs.last_read_message_num) as unreadCount,
+	 		 <!-- 해당 방의 가장 마지막(최신) 메시지 내용 -->
+	 		 (select content
+	 		  from chat_message
+	 		  where message_num = (select max(message_num) from chat_message where channel_num = c.channel_num)
+	 		 ) as lastMessage,
+	 		 <!-- 해당 방의 가장 마지막(최신) 메시지 전송 시간 -->
+	 		 (select to_char(send_date,'AM HH:MI')
+	 		  from chat_message
+	 		  where message_num = (select max(message_num) from chat_message where channel_num = c.channel_num)
+	 		 ) as lastTime
+	 	from chat_channel c
+	 	left outer join chat_read_status rs on c.channel_num = rs.channel_num and rs.user_num = #{user_num}
+	    where c.team_num = #{team_num}
+	 	order by c.channel_num asc
+	 </select>
+	 
+	 <select id="selectMessageList" parameterType="long" resultType="ChatMessageVO">
+	 	select
+	 		m.message_num,
+	 		m.channel_num,
+	 		m.user_num,
+	 		m.content,
+	 		m.parent_message,
+	 		m.send_date,
+	 		u.user_name as userName,
+	 		f.file_num, f.origin_name, f.file_type, f.file_size
+	 		from chat_message m
+	 	join users u on m.user_num = u.user_num
+	 	left outer join chat_file f on m.message_num = f.message_num
+	 	where m.channel_num = #{channel_num}
+	 	order by m.message_num asc
+	 </select>
+	 
+	 <insert id="insertChannel" parameterType="ChatChannelVO">
+	 	<selectKey keyProperty="channel_num" resultType="long" order="BEFORE">
+	 		select seq_chat_channel.nextval from dual
+	 	</selectKey>
+	 	insert into chat_channel(
+	 		channel_num,
+	 		team_num,
+	 		channel_name,	
+	 		create_date,
+	 		create_by,
+	 		channel_desc,
+	 		category
+	 	)values (
+	 		#{channel_num},
+	 		#{team_num},
+	 		#{channel_name},
+	 		sysdate,
+	 		#{create_by},
+	 		#{channel_desc},
+	 		#{category}	
+	 	)
+	 </insert>
+</mapper>
+
+
+
+
+
+
+

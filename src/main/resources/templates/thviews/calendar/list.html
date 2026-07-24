@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>calendar</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
+
+    <style>
+        .calendar-page {
+            padding: 32px;
+        }
+
+        .calendar-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 16px 44px rgba(73, 47, 133, 0.12);
+        }
+
+        .calendar-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: #2f2750;
+        }
+
+        #calendar {
+            min-height: 720px;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .fc .fc-button-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: #5a4bd1;
+            border-color: #5a4bd1;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content" th:with="currentMenu='calendar'">
+
+    <div class="calendar-page">
+        <div class="calendar-card">
+            <h2 class="calendar-title">캘린더</h2>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                height: 'auto',
+
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+
+                events: '/calendar/events?team_num=2',
+
+                eventClick: function (info) {
+                    console.log('이벤트 전체:', info.event);
+                    console.log('이벤트 ID:', info.event.id);
+                    console.log('제목:', info.event.title);
+                    console.log('추가 정보:', info.event.extendedProps);
+
+                    alert(info.event.title);
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+</div>
+</body>
+</html>

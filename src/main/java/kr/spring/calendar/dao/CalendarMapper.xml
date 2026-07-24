@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+
+<mapper namespace="kr.spring.calendar.dao.CalendarMapper">
+
+	<resultMap id="calendarEventMap" type="kr.spring.calendar.vo.CalendarEventVO">
+		<result property="id" column="EVENT_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="start" column="START_DATE"/>
+		<result property="end" column="END_DATE"/>
+		<result property="color" column="COLOR"/>
+		<result property="allDay" column="ALL_DAY_VALUE"/>
+
+		<result property="type" column="EVENT_TYPE"/>
+		<result property="schedule_num" column="SCHEDULE_NUM"/>
+		<result property="team_num" column="TEAM_NUM"/>
+		<result property="category" column="CATEGORY"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+
+	<select id="selectScheduleEventList"
+	        resultMap="calendarEventMap">
+
+		SELECT
+			'SCHEDULE-' || SCHEDULE_NUM AS EVENT_ID,
+			TITLE,
+			START_DATE,
+			END_DATE,
+			COLOR,
+			CASE
+				WHEN ALL_DAY = 1 THEN 1
+				ELSE 0
+			END AS ALL_DAY_VALUE,
+
+			'SCHEDULE' AS EVENT_TYPE,
+			SCHEDULE_NUM,
+			TEAM_NUM,
+			CATEGORY,
+			CONTENT
+		FROM SCHEDULE
+		WHERE TEAM_NUM = #{team_num}
+		  AND STATUS = 1
+		ORDER BY START_DATE ASC
+
+	</select>
+
+</mapper>
